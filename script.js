@@ -347,32 +347,40 @@ const MUSIC_BOX_MELODY = [
 ];
 let melodyStep = 0;
 
-function toggleMusic() {
-  const btn = $("#music-btn");
+function startMusic() {
+  if (isMusicPlaying) return;
   const ctx = getAudioContext();
   if (!ctx) return;
+  if (ctx.state === "suspended") ctx.resume();
+  isMusicPlaying = true;
+  $("#music-btn")?.classList.add("playing");
+  clearInterval(musicInterval);
+  musicInterval = setInterval(() => {
+    if (!isMusicPlaying) return;
+    const freq = MUSIC_BOX_MELODY[melodyStep % MUSIC_BOX_MELODY.length];
+    playNote(freq, "sine", 1.8, 0, 0.08);
+    // Nốt đệm âm trầm cách 2 nhịp
+    if (melodyStep % 4 === 0) {
+      playNote(freq / 2, "sine", 2.2, 0, 0.05);
+    }
+    melodyStep++;
+  }, 450);
+}
 
+function pauseMusic() {
+  if (!isMusicPlaying) return;
+  isMusicPlaying = false;
+  clearInterval(musicInterval);
+  $("#music-btn")?.classList.remove("playing");
+}
+
+function toggleMusic() {
   if (isMusicPlaying) {
-    isMusicPlaying = false;
-    clearInterval(musicInterval);
-    btn?.classList.remove("playing");
+    pauseMusic();
     toast("Đã tắt nhạc nền 🎵");
   } else {
-    isMusicPlaying = true;
-    btn?.classList.add("playing");
+    startMusic();
     toast("Đang phát giai điệu hộp nhạc du dương 🎶");
-
-    // Phát từng nốt nhẹ nhàng
-    musicInterval = setInterval(() => {
-      if (!isMusicPlaying) return;
-      const freq = MUSIC_BOX_MELODY[melodyStep % MUSIC_BOX_MELODY.length];
-      playNote(freq, "sine", 1.8, 0, 0.08);
-      // Nốt đệm âm trầm cách 2 nhịp
-      if (melodyStep % 4 === 0) {
-        playNote(freq / 2, "sine", 2.2, 0, 0.05);
-      }
-      melodyStep++;
-    }, 450);
   }
 }
 
@@ -385,8 +393,9 @@ async function openFor(person, isFromGate = false) {
   currentPerson = person;
   document.title = `Gửi ${displayName(person)} – Chúc Mừng 20/10 💐`;
 
-  // Mở âm thanh nếu chưa chạy
+  // Mở âm thanh và phát nhạc nền nếu chưa chạy
   getAudioContext();
+  startMusic();
 
   // Cập nhật tên lên phong bì
   $("#env-letter-name").textContent = displayName(person);
@@ -729,7 +738,7 @@ function renderFamilyTree() {
       <div class="node" data-id="${ngoai.id}" style="--accent: ${ngoai.mau}">
         <div class="node-avatar">${ngoai.avatar}</div>
         <h3 class="node-name">${displayName(ngoai)}</h3>
-        <span class="node-cta">🔒 Mở thư →</span>
+        <span class="node-cta">🌸 Mở thiệp →</span>
       </div>
     </div>
 
@@ -738,7 +747,7 @@ function renderFamilyTree() {
       <div class="node" data-id="${me.id}" style="--accent: ${me.mau}">
         <div class="node-avatar">${me.avatar}</div>
         <h3 class="node-name">${displayName(me)}</h3>
-        <span class="node-cta">🔒 Mở thư →</span>
+        <span class="node-cta">🌸 Mở thiệp →</span>
       </div>
     </div>
 
@@ -750,7 +759,7 @@ function renderFamilyTree() {
         <div class="node" data-id="${sis.id}" style="--accent: ${sis.mau}">
           <div class="node-avatar">${sis.avatar}</div>
           <h3 class="node-name">${displayName(sis)}</h3>
-          <span class="node-cta">🔒 Mở thư →</span>
+          <span class="node-cta">🌸 Mở thiệp →</span>
         </div>
       `
         )
@@ -758,12 +767,12 @@ function renderFamilyTree() {
     </div>
   `;
 
-  // Gắn sự kiện click yêu cầu mật khẩu mở khóa cho từng người
+  // Gắn sự kiện click mở ngay thiệp của người đó
   treeContainer.querySelectorAll(".node").forEach((node) => {
     node.addEventListener("click", () => {
       const id = node.getAttribute("data-id");
       const person = FAMILY.find((p) => p.id === id);
-      if (person) openLockModalFor(person);
+      if (person) openFor(person, false);
     });
 
     // Hiệu ứng 3D Parallax khi rê chuột vào node
@@ -1177,14 +1186,17 @@ function animate() {
    ===================================================================== */
 window.addEventListener("resize", resizeCanvases);
 
-// Kích hoạt audio khi chạm lần đầu vào bất cứ đâu
-window.addEventListener(
-  "pointerdown",
-  () => {
-    getAudioContext();
-  },
-  { once: true }
-);
+// Kích hoạt audio và tự động phát nhạc nền êm dịu khi người dùng tương tác lần đầu
+const startOnFirstGesture = () => {
+  getAudioContext();
+  startMusic();
+  window.removeEventListener("pointerdown", startOnFirstGesture);
+  window.removeEventListener("touchstart", startOnFirstGesture);
+  window.removeEventListener("keydown", startOnFirstGesture);
+};
+window.addEventListener("pointerdown", startOnFirstGesture);
+window.addEventListener("touchstart", startOnFirstGesture);
+window.addEventListener("keydown", startOnFirstGesture);
 
 // Khởi chạy các khối
 splitTitleLetters();
