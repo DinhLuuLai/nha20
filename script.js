@@ -31,7 +31,7 @@ const FAMILY = [
     danhXung: "Mẹ",
     tenMacDinh: "Mẹ Hiếu",
     vaiTro: "Kính gửi",
-    avatar: "👩‍🌾",
+    avatar: "👩",
     mau: "#ff7aa2",
     goiY: ["hiếu", "hieu", "mẹ hiếu", "me hieu", "mẹ", "me", "má", "ma", "u", "mẹ yêu", "me yeu", "mom", "bà hiếu"],
     loiChuc: [
