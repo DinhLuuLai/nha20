@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20261019_9">
+  <link rel="stylesheet" href="style.css?v=20261020_2">
 </head>
 <body>
   <!-- Nền: cực quang huyền ảo + 2 lớp canvas hiệu ứng (sau & trước) -->
@@ -51,7 +51,6 @@
           </div>
 
           <div class="gate-footer">
-            <button type="button" id="gate-explore-btn" class="btn-link">🌿 Khám phá không gian gia đình & Vườn hoa 20/10 ↓</button>
             <p class="gate-sound">🔊 Chạm màn hình để bật giai điệu âm nhạc ngọt ngào</p>
           </div>
         </div>
@@ -256,14 +255,18 @@
 
           <div class="card-body" id="card-body" title="Chạm để hiện toàn bộ lời chúc ngay"></div>
 
+          <!-- Khu vực hiển thị lời phản hồi đã gửi -->
+          <div class="card-feedbacks" id="card-feedbacks"></div>
+
           <footer class="card-foot">
             <p class="signature" id="card-sign"></p>
             <div class="card-actions">
               <button id="heart-btn" type="button" class="btn btn-heart">❤ Thả tim <b id="heart-count">0</b></button>
+              <button id="feedback-open-btn" type="button" class="btn btn-primary btn-feedback">✍️ Viết lời phản hồi</button>
               <button id="replay-btn" type="button" class="btn btn-ghost">↺ Đọc lại</button>
               <button id="copy-btn" type="button" class="btn btn-ghost">🔗 Copy link thiệp</button>
               <button id="view-family-btn" type="button" class="btn btn-ghost">🌿 Vườn hoa & Cây gia đình</button>
-              <button id="back-btn" type="button" class="btn btn-primary">🔒 Khóa & Đổi người 💐</button>
+              <button id="back-btn" type="button" class="btn btn-ghost">🔒 Khóa & Đổi người 💐</button>
             </div>
           </footer>
         </article>
@@ -301,6 +304,47 @@
     </div>
   </div>
 
-  <script src="script.js?v=20261019_9"></script>
+  <!-- Modal viết bài phản hồi / lời nhắn gửi lại cho Út -->
+  <div id="feedback-modal" class="lock-modal feedback-modal" aria-hidden="true" role="dialog" aria-labelledby="feedback-title">
+    <div class="lock-modal-overlay" id="feedback-overlay"></div>
+    <div class="lock-modal-card feedback-card">
+      <div class="modal-lock-icon" aria-hidden="true">💌</div>
+      <h3 id="feedback-title" class="modal-title">Gửi Lời Hồi Âm Đến Út</h3>
+      <p class="modal-desc" id="feedback-desc">Viết vài dòng chia sẻ, cảm nghĩ hoặc lời nhắn nhủ yêu thương của bạn gửi lại nhé 💕</p>
+
+      <!-- Emotion quick select chips -->
+      <div class="feedback-emotions" id="feedback-emotions">
+        <button type="button" class="emotion-chip" data-text="Cảm ơn món quà thật ý nghĩa và ấm áp nha! 🥰">🥰 Cảm động quá</button>
+        <button type="button" class="emotion-chip" data-text="Thương Út nhiều lắm, chúc Út luôn vui khỏe và hạnh phúc! ❤️">❤️ Yêu Út nhiều</button>
+        <button type="button" class="emotion-chip" data-text="Trang web xịn sò và đẹp mắt quá chừng luôn á! 🌸">🌸 Web đẹp lắm</button>
+        <button type="button" class="emotion-chip" data-text="Bớt lầy lại nha người anh em, cười muốn nội thương luôn á 🤣">🤣 Cười xỉu</button>
+      </div>
+
+      <form id="feedback-form" autocomplete="off" novalidate>
+        <div class="feedback-field">
+          <label for="feedback-sender" class="feedback-label">Tên của bạn:</label>
+          <div class="input-wrap feedback-input-wrap">
+            <span class="input-icon" aria-hidden="true">👤</span>
+            <input id="feedback-sender" type="text" placeholder="Tên của bạn..." maxlength="35">
+          </div>
+        </div>
+
+        <div class="feedback-field">
+          <label for="feedback-textarea" class="feedback-label">Nội dung phản hồi:</label>
+          <textarea id="feedback-textarea" class="feedback-textarea" rows="4" maxlength="500" placeholder="Viết cảm nghĩ hoặc lời nhắn của bạn tại đây..."></textarea>
+          <div class="char-count"><span id="char-num">0</span>/500</div>
+        </div>
+
+        <div class="feedback-btn-row">
+          <button id="feedback-submit-btn" type="submit" class="btn btn-primary">Gửi lời nhắn ngay 💌</button>
+          <button id="copy-feedback-btn" type="button" class="btn btn-ghost" style="display: none;">📋 Copy gửi Zalo</button>
+        </div>
+        <p id="feedback-msg" class="form-msg" role="status" aria-live="polite"></p>
+      </form>
+      <button type="button" id="feedback-close-btn" class="modal-close-btn">✕ Đóng lại</button>
+    </div>
+  </div>
+
+  <script src="script.js?v=20261020_2"></script>
 </body>
 </html>

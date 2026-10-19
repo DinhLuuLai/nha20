@@ -513,6 +513,9 @@ function renderCard(person) {
   heartCount = 0;
   const countEl = $("#heart-count");
   if (countEl) countEl.textContent = "0";
+
+  // Hiển thị danh sách lời phản hồi của người này (nếu có)
+  renderFeedbacks(person.id);
 }
 
 /* ---------- Hiệu ứng gõ chữ từng ký tự ---------- */
@@ -669,6 +672,169 @@ function toast(msg) {
 }
 
 /* =====================================================================
+   HỆ THỐNG PHẢN HỒI / HỒI ÂM LỜI CHÚC (FEEDBACK SYSTEM)
+   ===================================================================== */
+function getSavedFeedbacks() {
+  try {
+    return JSON.parse(localStorage.getItem("feedbacks_2010") || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function saveFeedbacks(list) {
+  try {
+    localStorage.setItem("feedbacks_2010", JSON.stringify(list));
+  } catch (err) {
+    console.error("Failed to save feedbacks:", err);
+  }
+}
+
+function renderFeedbacks(personId) {
+  const container = $("#card-feedbacks");
+  if (!container) return;
+
+  const all = getSavedFeedbacks();
+  const personFeedbacks = all.filter((f) => f.personId === personId);
+
+  if (personFeedbacks.length === 0) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = personFeedbacks
+    .map(
+      (f) => `
+    <div class="feedback-note">
+      <div class="feedback-note-head">
+        <span class="feedback-note-author">💌 Lời hồi âm từ ${f.sender}:</span>
+        <span class="feedback-note-time">${f.time}</span>
+      </div>
+      <p class="feedback-note-text">“${f.message}”</p>
+    </div>
+  `
+    )
+    .join("");
+}
+
+function openFeedbackModal() {
+  const modal = $("#feedback-modal");
+  const senderInput = $("#feedback-sender");
+  const textarea = $("#feedback-textarea");
+  const msgEl = $("#feedback-msg");
+  const charNum = $("#char-num");
+  const copyBtn = $("#copy-feedback-btn");
+
+  if (currentPerson && senderInput) {
+    senderInput.value = displayName(currentPerson);
+  }
+  if (textarea) textarea.value = "";
+  if (charNum) charNum.textContent = "0";
+  if (msgEl) msgEl.textContent = "";
+  if (copyBtn) copyBtn.style.display = "none";
+
+  modal?.classList.add("open");
+  modal?.setAttribute("aria-hidden", "false");
+  setTimeout(() => textarea?.focus(), 250);
+}
+
+function closeFeedbackModal() {
+  const modal = $("#feedback-modal");
+  modal?.classList.remove("open");
+  modal?.setAttribute("aria-hidden", "true");
+}
+
+$("#feedback-open-btn")?.addEventListener("click", openFeedbackModal);
+$("#feedback-close-btn")?.addEventListener("click", closeFeedbackModal);
+$("#feedback-overlay")?.addEventListener("click", closeFeedbackModal);
+
+// Đếm ký tự trong ô phản hồi
+$("#feedback-textarea")?.addEventListener("input", (e) => {
+  const charNum = $("#char-num");
+  if (charNum) charNum.textContent = String(e.target.value.length);
+});
+
+// Chạm vào cảm xúc mẫu để điền nhanh
+$$(".emotion-chip").forEach((chip) => {
+  chip.addEventListener("click", () => {
+    const text = chip.getAttribute("data-text");
+    const textarea = $("#feedback-textarea");
+    if (!textarea) return;
+    if (textarea.value.trim()) {
+      textarea.value += " " + text;
+    } else {
+      textarea.value = text;
+    }
+    const charNum = $("#char-num");
+    if (charNum) charNum.textContent = String(textarea.value.length);
+    playPopSound();
+  });
+});
+
+// Xử lý gửi phản hồi
+$("#feedback-form")?.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const senderInput = $("#feedback-sender");
+  const textarea = $("#feedback-textarea");
+  const msgEl = $("#feedback-msg");
+  const copyBtn = $("#copy-feedback-btn");
+
+  const sender = senderInput ? senderInput.value.trim() : "";
+  const message = textarea ? textarea.value.trim() : "";
+
+  if (!message) {
+    if (msgEl) msgEl.textContent = "Bạn hãy viết đôi dòng cảm nghĩ trước khi gửi nhé 💕";
+    textarea?.focus();
+    return;
+  }
+
+  const senderName = sender || (currentPerson ? displayName(currentPerson) : "Người yêu thương");
+  const newFeedback = {
+    id: Date.now(),
+    personId: currentPerson ? currentPerson.id : "guest",
+    sender: senderName,
+    message: message,
+    time:
+      new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }) +
+      " · " +
+      new Date().toLocaleDateString("vi-VN"),
+  };
+
+  const list = getSavedFeedbacks();
+  list.unshift(newFeedback);
+  saveFeedbacks(list);
+
+  // Hiệu ứng âm thanh và pháo hoa ăn mừng
+  playMagicalChime();
+  const rect = $("#card")?.getBoundingClientRect() || { left: window.innerWidth / 2, top: 200, width: 0 };
+  launchFireworkBurst(rect.left + rect.width / 2, Math.max(rect.top + 60, 100), currentPerson?.mau || "#ff7aa2");
+  burstConfetti(rect.left + rect.width / 2, Math.max(rect.top + 60, 100), 70, currentPerson?.mau || "#ff7aa2");
+
+  if (msgEl) {
+    msgEl.textContent = `✨ Đã gửi lời nhắn thành công! Út đã nhận được tình cảm của ${senderName} rồi nha ❤️`;
+  }
+
+  // Cập nhật hiển thị phản hồi trên thiệp ngay lập tức
+  if (currentPerson) renderFeedbacks(currentPerson.id);
+
+  // Hiển thị nút copy để gửi qua Zalo nếu muốn
+  if (copyBtn) {
+    copyBtn.style.display = "inline-flex";
+    copyBtn.onclick = async () => {
+      const shareText = `Lời hồi âm 20/10 gửi Út từ ${senderName}:\n"${message}"`;
+      try {
+        await navigator.clipboard.writeText(shareText);
+        toast("Đã copy lời nhắn! Bạn có thể dán vào Zalo gửi cho Út rồi nè 💌");
+      } catch {
+        toast("Lời nhắn: " + message);
+      }
+    };
+  }
+
+  toast(`Đã gửi lời hồi âm của ${senderName} 💌`);
+});
+
+/* =====================================================================
    XỬ LÝ ĐĂNG NHẬP (TẠI GATE & TẠI TRANG CHỦ)
    ===================================================================== */
 function handleLoginAttempt(inputEl, wrapEl, msgEl, isFromGate = false) {
@@ -772,8 +938,9 @@ $("#modal-form")?.addEventListener("submit", (e) => {
   }
 
   // Nếu nhập đúng tên:
+  const personToOpen = modalPendingPerson;
   closeLockModal();
-  openFor(modalPendingPerson, false);
+  openFor(personToOpen, false);
 });
 
 /* =====================================================================
@@ -804,7 +971,7 @@ function renderFamilyTree() {
       <div class="node" data-id="${ngoai.id}" style="--accent: ${ngoai.mau}">
         <div class="node-avatar">${ngoai.avatar}</div>
         <h3 class="node-name">${displayName(ngoai)}</h3>
-        <span class="node-cta">🌸 Mở thiệp →</span>
+        <span class="node-cta">🔒 Mở thư →</span>
       </div>
     </div>
 
@@ -813,7 +980,7 @@ function renderFamilyTree() {
       <div class="node" data-id="${me.id}" style="--accent: ${me.mau}">
         <div class="node-avatar">${me.avatar}</div>
         <h3 class="node-name">${displayName(me)}</h3>
-        <span class="node-cta">🌸 Mở thiệp →</span>
+        <span class="node-cta">🔒 Mở thư →</span>
       </div>
     </div>
 
@@ -825,7 +992,7 @@ function renderFamilyTree() {
         <div class="node" data-id="${sis.id}" style="--accent: ${sis.mau}">
           <div class="node-avatar">${sis.avatar}</div>
           <h3 class="node-name">${displayName(sis)}</h3>
-          <span class="node-cta">🌸 Mở thiệp →</span>
+          <span class="node-cta">🔒 Mở thư →</span>
         </div>
       `
         )
@@ -833,12 +1000,12 @@ function renderFamilyTree() {
     </div>
   `;
 
-  // Gắn sự kiện click mở ngay thiệp của người đó
+  // Gắn sự kiện click: bắt buộc nhập đúng tên mới mở khóa thư
   treeContainer.querySelectorAll(".node").forEach((node) => {
     node.addEventListener("click", () => {
       const id = node.getAttribute("data-id");
       const person = FAMILY.find((p) => p.id === id);
-      if (person) openFor(person, false);
+      if (person) openLockModalFor(person);
     });
 
     // Hiệu ứng 3D Parallax khi rê chuột vào node
