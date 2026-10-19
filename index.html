@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a0820">
+  <title>Chúc Mừng 20/10 – Gửi Những Người Phụ Nữ Tuyệt Vời Nhất</title>
+  <meta name="description" content="Món quà 20/10 dành riêng cho những người phụ nữ tuyệt vời của gia đình. Nhập tên để mở món quà và lá thư dành riêng cho bạn.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=20261019_5">
+</head>
+<body>
+  <!-- Nền: cực quang huyền ảo + 2 lớp canvas hiệu ứng (sau & trước) -->
+  <div class="aurora" aria-hidden="true"><span></span><span></span><span></span></div>
+  <canvas id="fx-back" class="fx" aria-hidden="true"></canvas>
+
+  <main class="app">
+    <!-- ============ 0. MÀN HÌNH ĐĂNG NHẬP / MỞ HỘP QUÀ BÍ MẬT ============ -->
+    <section id="screen-gate" class="screen screen-center active" aria-label="Đăng nhập mở quà 20/10">
+      <div class="gate">
+        <p class="gate-tag">✦ 20 · 10 · NGÀY PHỤ NỮ VIỆT NAM ✦</p>
+        <h1 class="gate-title">Món Quà Bí Mật Dành Cho Bạn</h1>
+        <p class="gate-sub">Dành tặng những người phụ nữ yêu thương của gia đình</p>
+
+        <!-- Hộp quà 3D lung linh có thể bấm -->
+        <button type="button" class="gift" id="gift-btn" aria-label="Chạm để mở hộp quà">
+          <span class="gift-rays" aria-hidden="true"></span>
+          <span class="gift-halo" aria-hidden="true"></span>
+          <span class="gift-lid" aria-hidden="true"><span class="gift-bow"></span></span>
+          <span class="gift-box" aria-hidden="true"></span>
+        </button>
+
+        <!-- Form nhập tên đăng nhập -->
+        <div class="gate-card">
+          <p class="gate-hint">Vui lòng nhập tên của bạn để mở thiệp riêng:</p>
+          <form id="gate-form" class="gate-form" autocomplete="off" novalidate>
+            <div class="input-wrap" id="gate-input-wrap">
+              <span class="input-icon" aria-hidden="true">🌸</span>
+              <input id="gate-input" type="text" placeholder="Nhập tên của bạn..." aria-label="Nhập tên của bạn" maxlength="40">
+              <button id="gate-open-btn" type="submit" class="btn btn-primary">Mở quà ngay <span aria-hidden="true">💌</span></button>
+            </div>
+            <p id="gate-msg" class="form-msg" role="status" aria-live="polite"></p>
+          </form>
+
+          <!-- Khóa bảo mật riêng tư cho từng người -->
+          <div class="lock-notice" aria-label="Bảo mật riêng tư">
+            <span class="lock-icon" aria-hidden="true">🔒</span>
+            <p><strong>Bảo mật riêng tư:</strong> Mỗi lá thư là món quà kín được gửi riêng cho từng người. Bạn chỉ có thể đọc thư bằng cách nhập chính xác tên của mình.</p>
+          </div>
+
+          <div class="gate-footer">
+            <button type="button" id="gate-explore-btn" class="btn-link">🌿 Khám phá không gian gia đình & Vườn hoa 20/10 ↓</button>
+            <p class="gate-sound">🔊 Chạm màn hình để bật giai điệu âm nhạc ngọt ngào</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 1. TRANG CHỦ MỞ RỘNG (VƯỜN HOA, CÂY GIA ĐÌNH, THƯ TAY) ============ -->
+    <section id="screen-home" class="screen screen-home" aria-hidden="true">
+      <header class="hero" id="hero">
+        <!-- Vườn hoa SVG nở rộ hai bên -->
+        <svg class="garden garden-left" viewBox="0 0 240 440" preserveAspectRatio="xMinYMax meet" aria-hidden="true">
+          <defs>
+            <radialGradient id="gPink" cx="50%" cy="90%" r="90%">
+              <stop offset="0%" stop-color="#fff0f5"/>
+              <stop offset="100%" stop-color="#ff6f9c"/>
+            </radialGradient>
+            <radialGradient id="gGold" cx="50%" cy="90%" r="90%">
+              <stop offset="0%" stop-color="#fff6e3"/>
+              <stop offset="100%" stop-color="#f2a950"/>
+            </radialGradient>
+            <radialGradient id="gLilac" cx="50%" cy="90%" r="90%">
+              <stop offset="0%" stop-color="#f6eeff"/>
+              <stop offset="100%" stop-color="#a77bff"/>
+            </radialGradient>
+          </defs>
+
+          <g class="flower" style="--d:.1s">
+            <path class="stem" pathLength="1" d="M60 440 C 72 360, 28 300, 70 210"/>
+            <path class="leaf" d="M58 365 C 30 355, 16 333, 12 306 C 40 314, 55 334, 58 365 Z"/>
+            <path class="leaf" d="M60 300 C 90 295, 104 276, 110 252 C 84 260, 68 278, 60 300 Z"/>
+            <g transform="translate(70 210)">
+              <g class="bloom">
+                <ellipse rx="14" ry="27" cy="-22" fill="url(#gPink)"/>
+                <ellipse rx="14" ry="27" cy="-22" fill="url(#gPink)" transform="rotate(60)"/>
+                <ellipse rx="14" ry="27" cy="-22" fill="url(#gPink)" transform="rotate(120)"/>
+                <ellipse rx="14" ry="27" cy="-22" fill="url(#gPink)" transform="rotate(180)"/>
+                <ellipse rx="14" ry="27" cy="-22" fill="url(#gPink)" transform="rotate(240)"/>
+                <ellipse rx="14" ry="27" cy="-22" fill="url(#gPink)" transform="rotate(300)"/>
+                <ellipse rx="8" ry="16" cy="-13" fill="#ffe3ec" transform="rotate(30)"/>
+                <ellipse rx="8" ry="16" cy="-13" fill="#ffe3ec" transform="rotate(150)"/>
+                <ellipse rx="8" ry="16" cy="-13" fill="#ffe3ec" transform="rotate(270)"/>
+                <circle r="9" fill="#f6c177"/>
+                <circle r="4" fill="#fff4d6"/>
+              </g>
+            </g>
+          </g>
+
+          <g class="flower" style="--d:.6s">
+            <path class="stem" pathLength="1" d="M125 440 C 118 390, 146 350, 128 296"/>
+            <path class="leaf" d="M122 402 C 148 396, 160 380, 166 358 C 142 365, 128 380, 122 402 Z"/>
+            <g transform="translate(128 296)">
+              <g class="bloom">
+                <ellipse rx="12" ry="22" cy="-17" fill="url(#gGold)"/>
+                <ellipse rx="12" ry="22" cy="-17" fill="url(#gGold)" transform="rotate(72)"/>
+                <ellipse rx="12" ry="22" cy="-17" fill="url(#gGold)" transform="rotate(144)"/>
+                <ellipse rx="12" ry="22" cy="-17" fill="url(#gGold)" transform="rotate(216)"/>
+                <ellipse rx="12" ry="22" cy="-17" fill="url(#gGold)" transform="rotate(288)"/>
+                <circle r="8" fill="#e8457a"/>
+                <circle r="3.5" fill="#ffd0dc"/>
+              </g>
+            </g>
+          </g>
+
+          <g class="flower" style="--d:1s">
+            <path class="stem" pathLength="1" d="M22 440 C 28 410, 6 384, 26 352"/>
+            <g transform="translate(26 352)">
+              <g class="bloom">
+                <ellipse rx="9" ry="16" cy="-12" fill="url(#gLilac)"/>
+                <ellipse rx="9" ry="16" cy="-12" fill="url(#gLilac)" transform="rotate(72)"/>
+                <ellipse rx="9" ry="16" cy="-12" fill="url(#gLilac)" transform="rotate(144)"/>
+                <ellipse rx="9" ry="16" cy="-12" fill="url(#gLilac)" transform="rotate(216)"/>
+                <ellipse rx="9" ry="16" cy="-12" fill="url(#gLilac)" transform="rotate(288)"/>
+                <circle r="5.5" fill="#fff2c7"/>
+              </g>
+            </g>
+          </g>
+
+          <g class="flower" style="--d:1.3s">
+            <path class="stem" pathLength="1" d="M190 440 C 196 412, 178 392, 196 366"/>
+            <g transform="translate(196 366)">
+              <g class="bloom">
+                <ellipse rx="8" ry="14" cy="-10" fill="url(#gPink)"/>
+                <ellipse rx="8" ry="14" cy="-10" fill="url(#gPink)" transform="rotate(90)"/>
+                <ellipse rx="8" ry="14" cy="-10" fill="url(#gPink)" transform="rotate(180)"/>
+                <ellipse rx="8" ry="14" cy="-10" fill="url(#gPink)" transform="rotate(270)"/>
+                <circle r="4.5" fill="#f6c177"/>
+              </g>
+            </g>
+          </g>
+        </svg>
+
+        <div class="intro">
+          <div class="bouquet-wrap">
+            <div class="bouquet-ring"></div>
+            <div class="bouquet">
+              <img src="assets/bouquet.jpg" alt="Bó hoa chúc mừng Ngày Phụ Nữ Việt Nam 20/10">
+            </div>
+            <span class="orbit orbit-1" aria-hidden="true">✦</span>
+            <span class="orbit orbit-2" aria-hidden="true">❀</span>
+            <span class="orbit orbit-3" aria-hidden="true">♥</span>
+          </div>
+
+          <p class="countdown" id="countdown"><span class="dot"></span><span id="countdown-text">20 · 10 · Ngày Phụ Nữ Việt Nam</span></p>
+
+          <h1 id="main-title" class="title">
+            <span class="line" data-split>Gửi những người phụ nữ</span>
+            <span class="line line-accent" data-split>tuyệt vời nhất đời mình</span>
+          </h1>
+
+          <p class="subtitle">Mỗi người một lá thư riêng, gói ghém bằng cả tấm lòng.<br>Nhập tên của bạn hoặc chọn dưới Cây gia đình để mở thiệp 💌</p>
+
+          <form id="name-form" class="name-form" autocomplete="off" novalidate>
+            <div class="input-wrap" id="home-input-wrap">
+              <span class="input-icon" aria-hidden="true">🌸</span>
+              <input id="name-input" type="text" placeholder="Nhập tên của bạn..." aria-label="Nhập tên của bạn" maxlength="40">
+              <button id="open-btn" type="submit" class="btn btn-primary">Mở thiệp <span aria-hidden="true">💌</span></button>
+            </div>
+            <p id="form-msg" class="form-msg" role="status" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <button type="button" class="scroll-cue" id="scroll-cue" aria-label="Cuộn xuống xem thêm">
+          <span class="mouse"><span></span></span>
+          <span>Khám phá cây gia đình</span>
+        </button>
+      </header>
+
+      <!-- ============ PHẦN 1: CÂY GIA ĐÌNH TƯƠNG TÁC ============ -->
+      <section class="section" id="family" aria-labelledby="family-title">
+        <p class="section-eyebrow reveal">Cây gia đình</p>
+        <h2 id="family-title" class="section-title reveal">Những Người Phụ Nữ Của Nhà Mình</h2>
+        <p class="section-sub reveal">Chạm vào từng thành viên để mở thiệp chúc mừng riêng</p>
+        <div class="tree" id="tree"></div>
+      </section>
+
+      <!-- ============ PHẦN 2: BỨC THƯ TAY GỬI CẢ NHÀ ============ -->
+      <section class="section" id="letter" aria-labelledby="letter-title">
+        <p class="section-eyebrow reveal">Thư tay mộc mạc</p>
+        <h2 id="letter-title" class="section-title reveal">Gửi Cả Nhà Mình</h2>
+        <div class="paper-wrap reveal">
+          <article class="paper">
+            <p class="paper-date">Ngày 20 tháng 10</p>
+            <p class="paper-greet">Gửi Ngoại kính yêu, Mẹ Hiếu và 4 Chị (Hằng, Hiệu, Huế, Loan),</p>
+            <p>Út không quen nói những lời bóng bẩy, nên Út tự tay dựng trang web nhỏ này thay cho một đóa hoa thơm — và thay cho những lời yêu thương mà thường ngày Út hay ngại thổ lộ.</p>
+            <p>Gia đình mình có <strong>Bà Ngoại</strong> là cội nguồn gốc rễ yêu thương, có <strong>Mẹ Hiếu</strong> là thân cây vững chãi che chở sớm hôm, và có <strong>bốn chị</strong> là những nhành hoa rạng rỡ khoe sắc. Út may mắn vô cùng khi được lớn lên dưới bóng mát tràn ngập tình thương ấy.</p>
+            <p>Mỗi người trong nhà đều có một công việc, một nỗi vất vả riêng: người tảo tần ruộng đồng, người buôn bán đàn gà đàn vịt, người bận rộn chăm sóc ba cô công chúa nhỏ, người nâng niu tổ ấm nhỏ, và có cả người khoác áo blouse trắng túc trực từng đêm ở bệnh viện… Dù ở đâu, làm gì, ai cũng luôn dành cho gia đình trọn vẹn sự hy sinh và yêu thương.</p>
+            <p>Nhân ngày Phụ nữ Việt Nam 20/10, Út chỉ cầu mong cho Ngoại, Mẹ và các chị luôn dồi dào sức khỏe, bình an trong tâm hồn và lúc nào cũng có nụ cười rạng rỡ trên môi. Cảm ơn mọi người vì đã luôn là chỗ dựa ấm áp nhất của Út.</p>
+            <p class="paper-sign">Thương cả nhà thật nhiều,<br><span>Út của gia đình ❤</span></p>
+            <span class="wax" aria-hidden="true">♥</span>
+          </article>
+        </div>
+      </section>
+
+      <!-- ============ PHẦN 3: LỜI CHÚC & DANH NGÔN ============ -->
+      <section class="section section-quote" aria-label="Những lời yêu thương">
+        <div class="quote-box reveal">
+          <span class="quote-mark" aria-hidden="true">“</span>
+          <p class="quote-text" id="quote-text"></p>
+          <div class="quote-dots" id="quote-dots"></div>
+        </div>
+      </section>
+
+      <footer class="site-foot">
+        <p class="foot-flower" aria-hidden="true">❀ ✦ ❀</p>
+        <p>Thiết kế bằng trọn vẹn tình cảm dành tặng gia đình · 20/10</p>
+        <p style="margin-top: 8px;"><button type="button" id="foot-back-gate" class="btn-link" style="color: var(--gold); font-size: 0.85rem;">↺ Quay lại màn hình đăng nhập</button></p>
+      </footer>
+    </section>
+
+    <!-- ============ 2. MÀN HÌNH PHONG BÌ 3D ============ -->
+    <section id="screen-envelope" class="screen screen-center" aria-hidden="true">
+      <div class="envelope-stage">
+        <div class="envelope" id="envelope">
+          <div class="env-back"></div>
+          <div class="env-letter"><span id="env-letter-name">❀</span></div>
+          <div class="env-front"></div>
+          <div class="env-flap"></div>
+          <div class="env-seal" aria-hidden="true">❤</div>
+        </div>
+        <p class="env-hint" id="env-hint">Có một bức thư dành riêng cho bạn...</p>
+      </div>
+    </section>
+
+    <!-- ============ 3. MÀN HÌNH THIỆP CHÚC MỪNG CHI TIẾT ============ -->
+    <section id="screen-card" class="screen screen-center" aria-hidden="true">
+      <div class="card-stage">
+        <article class="card" id="card">
+          <div class="card-glare" aria-hidden="true"></div>
+          <div class="card-holo" aria-hidden="true"></div>
+          <div class="card-shine" aria-hidden="true"></div>
+          <span class="corner tl" aria-hidden="true">❀</span>
+          <span class="corner tr" aria-hidden="true">❀</span>
+          <span class="corner bl" aria-hidden="true">❀</span>
+          <span class="corner br" aria-hidden="true">❀</span>
+
+          <header class="card-head">
+            <div class="avatar" id="card-avatar">🌸</div>
+            <p class="card-role" id="card-role"></p>
+            <h2 class="card-name" id="card-name"></h2>
+            <div class="divider" aria-hidden="true"><span>❀</span></div>
+          </header>
+
+          <div class="card-body" id="card-body" title="Chạm để hiện toàn bộ lời chúc ngay"></div>
+
+          <footer class="card-foot">
+            <p class="signature" id="card-sign"></p>
+            <div class="card-actions">
+              <button id="heart-btn" type="button" class="btn btn-heart">❤ Thả tim <b id="heart-count">0</b></button>
+              <button id="replay-btn" type="button" class="btn btn-ghost">↺ Đọc lại</button>
+              <button id="copy-btn" type="button" class="btn btn-ghost">🔗 Copy link thiệp</button>
+              <button id="view-family-btn" type="button" class="btn btn-ghost">🌿 Vườn hoa & Cây gia đình</button>
+              <button id="back-btn" type="button" class="btn btn-primary">🔒 Khóa & Đổi người 💐</button>
+            </div>
+          </footer>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <!-- Lớp canvas pháo hoa và hiệu ứng phía trước -->
+  <canvas id="fx-front" class="fx fx-front" aria-hidden="true"></canvas>
+
+  <!-- Nút điều khiển âm nhạc tích hợp -->
+  <button id="music-btn" type="button" class="music-btn" aria-label="Bật / tắt nhạc hộp nhạc">
+    <span class="bars"><i></i><i></i><i></i><i></i></span>
+  </button>
+
+  <!-- Hộp thông báo nhanh -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <!-- Modal bảo mật khóa thư khi bấm trên Cây Gia Đình -->
+  <div id="lock-modal" class="lock-modal" aria-hidden="true" role="dialog" aria-labelledby="modal-title">
+    <div class="lock-modal-overlay" id="modal-overlay"></div>
+    <div class="lock-modal-card">
+      <div class="modal-lock-icon" aria-hidden="true">🔒</div>
+      <h3 id="modal-title" class="modal-title">Lá Thư Được Khóa Mật</h3>
+      <p class="modal-desc">Lá thư này được gửi riêng cho <strong id="modal-target-name"></strong>.<br>Vui lòng nhập đúng tên để chứng minh và mở khóa:</p>
+      <form id="modal-form" autocomplete="off" novalidate>
+        <div class="input-wrap" id="modal-input-wrap">
+          <span class="input-icon" aria-hidden="true">🔑</span>
+          <input id="modal-input" type="text" placeholder="Nhập tên của bạn..." maxlength="35">
+          <button type="submit" class="btn btn-primary">Mở thư 💌</button>
+        </div>
+        <p id="modal-msg" class="form-msg" role="status" aria-live="polite"></p>
+      </form>
+      <button type="button" id="modal-close-btn" class="modal-close-btn">✕ Đóng lại</button>
+    </div>
+  </div>
+
+  <script src="script.js?v=20261019_7"></script>
+</body>
+</html>
