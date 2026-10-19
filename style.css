@@ -1908,3 +1908,46 @@ button { font-family: inherit; }
     transition-duration: 0.01ms !important;
   }
 }
+
+/* =====================================================================
+   TRẠNG THÁI KHÓA & ẨN CÂY GIA ĐÌNH (CHO HÙNG & LINH)
+   ===================================================================== */
+.locked-tree {
+  display: none !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.tree-locked-notice {
+  padding: 44px 24px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px dashed rgba(255, 122, 162, 0.4);
+  text-align: center;
+  max-width: 540px;
+  margin: 0 auto;
+  color: var(--muted);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.tree-locked-notice .tree-lock-icon {
+  font-size: 2.6rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.tree-locked-notice h3 {
+  font-family: var(--font-script);
+  font-size: 1.9rem;
+  color: var(--cream);
+  margin-bottom: 8px;
+}
+
+.tree-locked-notice p {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--muted);
+}
+

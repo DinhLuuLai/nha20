@@ -389,8 +389,58 @@ $("#music-btn")?.addEventListener("click", toggleMusic);
 /* =====================================================================
    MỞ QUÀ & CHUYỂN TIẾP THIỆP
    ===================================================================== */
+function isGuestPerson(person) {
+  return !!(person && (person.id === "hung" || person.id === "linh"));
+}
+
+function updateFamilyTreeAccess(person) {
+  const isGuest = isGuestPerson(person);
+  const familySec = $("#family");
+  const scrollCue = $("#scroll-cue");
+
+  if (isGuest) {
+    // Ẩn và khóa phần cây gia đình hoàn toàn khi Hùng hoặc Linh đăng nhập
+    if (familySec) {
+      familySec.classList.add("locked-tree");
+      familySec.style.display = "none";
+      familySec.setAttribute("aria-hidden", "true");
+    }
+    if (scrollCue) {
+      scrollCue.style.display = "none";
+    }
+    const treeContainer = $("#tree");
+    if (treeContainer) {
+      treeContainer.innerHTML = `
+        <div class="tree-locked-notice">
+          <span class="tree-lock-icon">🔒</span>
+          <h3>Khu Vực Cây Gia Đình Đã Khóa Bảo Mật</h3>
+          <p>Khu vực Cây gia đình và các lá thư riêng chỉ dành riêng cho các thành viên trong gia đình. Cảm ơn ${displayName(person)} đã ghé thăm! 💐</p>
+        </div>
+      `;
+    }
+  } else {
+    // Mở lại bình thường cho nội bộ gia đình
+    if (familySec) {
+      familySec.classList.remove("locked-tree");
+      familySec.style.display = "";
+      familySec.removeAttribute("aria-hidden");
+    }
+    if (scrollCue) {
+      scrollCue.style.display = "";
+    }
+    renderFamilyTree();
+  }
+}
+
 async function openFor(person, isFromGate = false) {
+  // Nếu đang là Hùng hoặc Linh đăng nhập, chặn mở thiệp của người trong gia đình
+  if (isGuestPerson(currentPerson) && person.id !== currentPerson.id) {
+    toast("🚫 Cây gia đình đã bị khóa riêng tư cho nội bộ gia đình!");
+    return;
+  }
+
   currentPerson = person;
+  updateFamilyTreeAccess(person);
   document.title = `Gửi ${displayName(person)} – Chúc Mừng 20/10 💐`;
 
   // Mở âm thanh và phát nhạc nền nếu chưa chạy
@@ -448,14 +498,13 @@ function renderCard(person) {
   $("#card-sign").textContent = person.ky;
   $("#card-sign").classList.remove("show");
 
-  // Tùy chỉnh nút xem vườn hoa phù hợp cho từng người
+  // Nút xem cây gia đình: Nếu là Hùng hoặc Linh thì ẨN HOÀN TOÀN
   const viewFamBtn = $("#view-family-btn");
   if (viewFamBtn) {
-    if (person.id === "hung") {
-      viewFamBtn.textContent = "🧹 Đi Rửa Bát & Quét Nhà Đi Cu 😆";
-    } else if (person.id === "linh") {
-      viewFamBtn.textContent = "🌿 Khám phá Vườn hoa 20/10";
+    if (isGuestPerson(person)) {
+      viewFamBtn.style.display = "none";
     } else {
+      viewFamBtn.style.display = "";
       viewFamBtn.textContent = "🌿 Vườn hoa & Cây gia đình";
     }
   }
@@ -556,6 +605,7 @@ function createFloatingHeart(x, y) {
 $("#back-btn")?.addEventListener("click", () => {
   typingToken++;
   currentPerson = null;
+  updateFamilyTreeAccess(null);
   document.title = "Chúc Mừng 20/10 – Gửi Những Người Phụ Nữ Tuyệt Vời Nhất";
   history.replaceState(null, "", location.pathname);
 
@@ -569,6 +619,10 @@ $("#back-btn")?.addEventListener("click", () => {
 });
 
 $("#view-family-btn")?.addEventListener("click", () => {
+  if (isGuestPerson(currentPerson)) {
+    toast("🚫 Cây gia đình đã bị khóa riêng tư cho nội bộ gia đình!");
+    return;
+  }
   showScreen("home");
   setTimeout(() => {
     $("#family")?.scrollIntoView({ behavior: "smooth" });
@@ -584,6 +638,7 @@ $("#foot-back-gate")?.addEventListener("click", () => {
 });
 
 $("#scroll-cue")?.addEventListener("click", () => {
+  if (isGuestPerson(currentPerson)) return;
   $("#family")?.scrollIntoView({ behavior: "smooth" });
 });
 
@@ -727,6 +782,17 @@ $("#modal-form")?.addEventListener("submit", (e) => {
 function renderFamilyTree() {
   const treeContainer = $("#tree");
   if (!treeContainer) return;
+
+  if (isGuestPerson(currentPerson)) {
+    treeContainer.innerHTML = `
+      <div class="tree-locked-notice">
+        <span class="tree-lock-icon">🔒</span>
+        <h3>Khu Vực Cây Gia Đình Đã Khóa Bảo Mật</h3>
+        <p>Khu vực Cây gia đình và các lá thư riêng chỉ dành riêng cho các thành viên trong gia đình. Cảm ơn ${displayName(currentPerson)} đã ghé thăm! 💐</p>
+      </div>
+    `;
+    return;
+  }
 
   const ngoai = FAMILY.find((p) => p.id === "ngoai");
   const me = FAMILY.find((p) => p.id === "me");
